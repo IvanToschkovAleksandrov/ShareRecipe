@@ -2,6 +2,7 @@
 using ShareRecipe.Contracts;
 using ShareRecipe.Models;
 using ShareRecipe.Models.Recipe;
+using ShareRecipe.Services.Models;
 
 namespace ShareRecipe.Controllers
 {
@@ -34,22 +35,34 @@ namespace ShareRecipe.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Create RecipeFormModel and load existing categories
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public IActionResult Add()
+        public async Task<IActionResult> Add()
         {
-            var model = new RecipeFormModel();
+            var products = await recipeService.GetAllProductsAsync();
+            var categories = await recipeService.GetAllCategoriesAsync();
+            
+            var model = new RecipeFormModel() 
+            {
+                Categories = categories,
+                Products = products
+            };
+
             return View(model);
         }
 
         [HttpPost]
-        public IActionResult Add(RecipeFormModel model)
+        public async Task<IActionResult> Add(RecipeFormModel model)
         {
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            //Do some logic here. Add to the database. And then redirect to newly created recipe.
+            await recipeService.CreateAsync(model);
 
             return RedirectToAction(nameof(Details));
         }
