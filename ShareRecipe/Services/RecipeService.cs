@@ -17,6 +17,12 @@ namespace ShareRecipe.Services
 
         public Task<AllRecipesQueryModel> AllAsync()
         {
+            //var allRecipes = await context<Recipe>()
+            //    .Select(r => new AllRecipesQueryModel()
+            //    {
+
+            //    })
+            //    .ToListAsync();
             throw new NotImplementedException();
         }
     }

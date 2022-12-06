@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ShareRecipe.Contracts;
 using ShareRecipe.Data;
+using ShareRecipe.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +22,10 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     options.Password.RequireNonAlphanumeric = false;
 })
     .AddEntityFrameworkStores<ShareRecipeDbContext>();
+
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddScoped<IRecipeService, RecipeService>();
 
 var app = builder.Build();
 
