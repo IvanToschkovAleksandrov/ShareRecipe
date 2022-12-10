@@ -20,6 +20,8 @@ namespace ShareRecipe.Services
         /// <returns></returns>
         public async Task<IEnumerable<RecipeIndexServiceModel>> GetRandomRecipesAsync()
         {
+            Random random = new Random();
+
             List<RecipeIndexServiceModel> result = new List<RecipeIndexServiceModel>();
             int recipesCount = 3;
 
@@ -31,7 +33,6 @@ namespace ShareRecipe.Services
                     ImageUrl = r.ImageUrl
                 })
                 .ToListAsync();
-            Random random = new Random();
 
             for (int i = 0; i < Math.Min(recipesCount, allRecipes.Count); i++)
             {

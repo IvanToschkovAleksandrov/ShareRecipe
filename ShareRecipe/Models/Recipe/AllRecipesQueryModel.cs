@@ -1,20 +1,26 @@
 ﻿using ShareRecipe.Data.Models;
+using ShareRecipe.Services.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace ShareRecipe.Models.Recipe
 {
     public class AllRecipesQueryModel
     {
-        [Required]
-        [StringLength(30, MinimumLength = 3)]
-        public string Title { get; set; } = null!;
+        public const int RecipesPerPage = 3;
 
-        [StringLength(500)]
-        public string? Description { get; set; }
+        public string? Category { get; init; }
 
-        [Required]
-        [StringLength(500, MinimumLength = 10)]
-        public string ImageUrl { get; set; } = null!;
-        public ICollection<Product> Products { get; set; } = new List<Product>();
+        [Display(Name = "Search by text")]
+        public string? SearchTerm { get; init; }
+
+        public int CurrentPage { get; init; } = 1;
+
+        public int TotalRecipesCount { get; set; }
+
+        public IEnumerable<string> Categories { get; set; } = Enumerable.Empty<string>();
+
+        public IEnumerable<RecipeServiceModel> Recipes { get; set; } = new List<RecipeServiceModel>();
+
+        public IEnumerable<RecipeProductServiceModel> Products { get; set; } = new List<RecipeProductServiceModel>();
     }
 }

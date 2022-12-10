@@ -4,6 +4,8 @@ using ShareRecipe.Data;
 using ShareRecipe.Data.Models;
 using ShareRecipe.Models.Recipe;
 using ShareRecipe.Services.Models;
+using System.Diagnostics.Eventing.Reader;
+using System.Linq;
 
 namespace ShareRecipe.Services
 {
@@ -16,9 +18,52 @@ namespace ShareRecipe.Services
             this.context = context;
         }
 
-        public async Task<AllRecipesQueryModel> AllAsync()
+        public async Task<RecipeQueryServiceModel> AllAsync(
+            string? category = null,
+            string? searchTerm = null,
+            int currentPage = 1,
+            int recipesPerPage = 1)
         {
+            var recipeQuery = context.Recipes.AsQueryable();
 
+            if (!string.IsNullOrEmpty(category))
+            {
+                recipeQuery = context.Recipes
+                    .Where(r => r.Category.Name == category);
+            }
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                recipeQuery = context.Recipes
+                    .Where(r =>
+                    r.Title.ToLower().Contains(searchTerm.ToLower()) ||
+                    (r.Description != null && r.Description.ToLower().Contains(searchTerm.ToLower())));
+                    //ContainsSearchTerm(r.Products, searchTerm));
+            }
+
+            var recipes = await recipeQuery
+                .Skip((currentPage - 1) * recipesPerPage)
+                .Take(recipesPerPage)
+                .Select(r => new RecipeServiceModel()
+                {
+                    Id = r.Id,
+                    Title = r.Title,
+                    Descriprion = r.Description,
+                    ImageUrl = r.ImageUrl
+                })
+                .ToListAsync();
+
+            var totalRecipesCount = await recipeQuery.CountAsync();
+
+            return new RecipeQueryServiceModel()
+            {
+                TotalRecipesCount = totalRecipesCount,
+                Recipes = recipes
+            }; 
+        }
+
+        public Task<IEnumerable<string>> AllCategoriesNamesAsync()
+        {
             throw new NotImplementedException();
         }
 
@@ -31,7 +76,7 @@ namespace ShareRecipe.Services
             {
                 Product product = new Product()
                 {
-                    Name = name
+                    Name = name.ToLower()
                 };
 
                 products.Add(product);
@@ -68,6 +113,17 @@ namespace ShareRecipe.Services
         }
 
         /// <summary>
+        /// Get all names of categories in tha database
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<string>> GetAllCategoriesNamesAsync()
+        {
+            return await context.Categories
+                .Select(c => c.Name)
+                .ToListAsync();
+        }
+
+        /// <summary>
         /// Get all Existing products in the database
         /// </summary>
         /// <returns></returns>
@@ -80,6 +136,19 @@ namespace ShareRecipe.Services
                     Name = p.Name
                 })
                 .ToListAsync();
+        }
+
+        private bool ContainsSearchTerm(IEnumerable<Product> products, string searchTerm)
+        {
+            foreach (var product in products)
+            {
+                if (product.Name == searchTerm)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

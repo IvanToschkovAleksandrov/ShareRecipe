@@ -16,11 +16,24 @@ namespace ShareRecipe.Controllers
         }
 
         [HttpGet]
-        public IActionResult All()
+        public async Task<IActionResult> All([FromQuery]AllRecipesQueryModel query)
         {
-            var model = new AllRecipesQueryModel();
+            var queryResult = await recipeService.AllAsync(
+                query.Category,
+                query.SearchTerm,
+                query.CurrentPage,
+                AllRecipesQueryModel.RecipesPerPage);
 
-            return View(model);
+            query.TotalRecipesCount = queryResult.TotalRecipesCount;
+            query.Recipes = queryResult.Recipes;
+
+            var recipeCategories = await recipeService.GetAllCategoriesNamesAsync();
+            query.Categories = recipeCategories;
+
+            var recipeProducts = await recipeService.GetAllProductsAsync();
+            query.Products = recipeProducts;
+
+            return View(query);
         }
 
         public IActionResult MyFavorite()
@@ -54,6 +67,11 @@ namespace ShareRecipe.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Add new recipe to the database.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Add(RecipeFormModel model)
         {
