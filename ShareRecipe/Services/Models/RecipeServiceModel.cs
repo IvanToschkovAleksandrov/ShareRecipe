@@ -7,7 +7,8 @@ namespace ShareRecipe.Services.Models
         public int Id { get; set; }
 
         public string Title { get; set; } = null!;
-        public string? Descriprion { get; set; }
+
+        public string? Description { get; set; }
 
         [DisplayName("Image Url")]
         public string ImageUrl { get; set; } = null!;

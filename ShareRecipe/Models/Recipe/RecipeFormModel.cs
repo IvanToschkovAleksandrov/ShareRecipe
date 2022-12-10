@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using ShareRecipe.Services.Models;
+﻿using ShareRecipe.Services.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace ShareRecipe.Models.Recipe
 {
@@ -18,7 +18,7 @@ namespace ShareRecipe.Models.Recipe
 
         [Required]
         [StringLength(500, MinimumLength = 10)]
-        public string Ingridients { get; set; }
+        public string Ingridients { get; set; } = null!;
 
         public IEnumerable<RecipeProductServiceModel> Products { get; set; } = new List<RecipeProductServiceModel>();
 

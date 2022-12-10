@@ -42,9 +42,15 @@ namespace ShareRecipe.Controllers
             return View(model);
         }
 
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var model = new RecipeDetailsViewModel();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var model = await recipeService.RecipeDetailsByIdAsync(id);
+
             return View(model);
         }
 
@@ -57,8 +63,8 @@ namespace ShareRecipe.Controllers
         {
             var products = await recipeService.GetAllProductsAsync();
             var categories = await recipeService.GetAllCategoriesAsync();
-            
-            var model = new RecipeFormModel() 
+
+            var model = new RecipeFormModel()
             {
                 Categories = categories,
                 Products = products

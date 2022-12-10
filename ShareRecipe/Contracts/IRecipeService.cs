@@ -11,8 +11,6 @@ namespace ShareRecipe.Contracts
             int currentPage = 1,
             int recipePerPage = 1);
         
-        Task<IEnumerable<string>> AllCategoriesNamesAsync();
-        
         Task<IEnumerable<RecipeCategoryServiceModel>> GetAllCategoriesAsync();
 
         Task<IEnumerable<string>> GetAllCategoriesNamesAsync();
@@ -20,5 +18,9 @@ namespace ShareRecipe.Contracts
         Task<IEnumerable<RecipeProductServiceModel>> GetAllProductsAsync();
         
         Task<int> CreateAsync(RecipeFormModel model);
+
+        Task<bool> Exist(int id);
+
+        Task<RecipeDetailsServiceModel> RecipeDetailsByIdAsync(int id);
     }
 }

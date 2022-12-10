@@ -48,7 +48,7 @@ namespace ShareRecipe.Services
                 {
                     Id = r.Id,
                     Title = r.Title,
-                    Descriprion = r.Description,
+                    Description = r.Description,
                     ImageUrl = r.ImageUrl
                 })
                 .ToListAsync();
@@ -60,11 +60,6 @@ namespace ShareRecipe.Services
                 TotalRecipesCount = totalRecipesCount,
                 Recipes = recipes
             }; 
-        }
-
-        public Task<IEnumerable<string>> AllCategoriesNamesAsync()
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<int> CreateAsync(RecipeFormModel model)
@@ -98,9 +93,20 @@ namespace ShareRecipe.Services
         }
 
         /// <summary>
+        /// Check whether the recipe exists.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> Exist(int id)
+        {
+            return await context.Recipes
+                .AnyAsync(r => r.Id == id);
+        }
+
+        /// <summary>
         /// Get all Existing Categories in the database.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>bool</returns>
         public async Task<IEnumerable<RecipeCategoryServiceModel>> GetAllCategoriesAsync()
         {
             return await context.Categories
@@ -136,6 +142,26 @@ namespace ShareRecipe.Services
                     Name = p.Name
                 })
                 .ToListAsync();
+        }
+
+        /// <summary>
+        /// Find and return recipe by given id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<RecipeDetailsServiceModel> RecipeDetailsByIdAsync(int id)
+        {
+            return await context.Recipes
+                .Where(r => r.Id == id)
+                .Select(r => new RecipeDetailsServiceModel()
+                {
+                    Id = r.Id,
+                    Title = r.Title,
+                    ImageUrl = r.ImageUrl,
+                    Category = r.Category.Name,
+                    Description = r.Description
+                })
+                .FirstAsync();
         }
 
         private bool ContainsSearchTerm(IEnumerable<Product> products, string searchTerm)
