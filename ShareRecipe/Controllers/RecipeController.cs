@@ -42,6 +42,11 @@ namespace ShareRecipe.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Display details for recipe with the given id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<IActionResult> Details(int id)
         {
             if (!ModelState.IsValid)
@@ -92,19 +97,50 @@ namespace ShareRecipe.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            RecipeFormModel model = new RecipeFormModel();
+            if(await recipeService.ExistsAsync(id) == false)
+            {
+                return BadRequest();
+            }
+
+            var recipe = await recipeService.RecipeDetailsByIdAsync(id);
+            var categoryId = await recipeService.GetRecipeCategoryIdAsync(recipe.Id);
+            var productNames = await recipeService.GetProductNamesByRecipeIdAsync(recipe.Id);
+            var products = await recipeService.GetAllProductsByRecipeIdAsync(recipe.Id);
+
+            RecipeFormModel model = new RecipeFormModel()
+            {
+                Title = recipe.Title,
+                Description = recipe.Description,
+                ImageUrl = recipe.ImageUrl,
+                CategoryId = categoryId,
+                Categories = await recipeService.GetAllCategoriesAsync(),
+                Ingridients = string.Join(", ", productNames),
+                Products = products
+            };
+
             return View(model);
         }
 
         [HttpPost]
-        public IActionResult Edit(int id, RecipeFormModel model)
+        public async Task<IActionResult> Edit(int id, RecipeFormModel model)
         {
-            //validate model with ModelState
-            // ToDo some logic for changing the data in the model entity and save changes
+            if (await recipeService.ExistsAsync(id) == false)
+            {
+                return View();
+            }
 
-            return RedirectToAction(nameof(Details));
+            if (!ModelState.IsValid)
+            {
+                model.Categories = await recipeService.GetAllCategoriesAsync();
+
+                return View(model);
+            }
+
+            await recipeService.EditAsync(id, model.Title, model.Description, model.ImageUrl, model.CategoryId, model.Ingridients);
+
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]

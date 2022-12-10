@@ -15,7 +15,7 @@ namespace ShareRecipe.Data.Configurations
                 Description = "Chop all ingridients and mix them together with the mayonnaise.",
                 Title = "Chicken salad with mayonnaise",
                 ImageUrl = "https://cdn-abioh.nitrocdn.com/iRwsMXPEdaMSNBlSqLBkXmjSJwoqRrps/assets/static/optimized/rev-f3f118f/wp-content/uploads/2014/10/Chicken-Salad-main-overhead.jpg"
-            }); ;
+            });
         }
     }
 }

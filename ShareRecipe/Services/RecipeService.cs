@@ -38,7 +38,7 @@ namespace ShareRecipe.Services
                     .Where(r =>
                     r.Title.ToLower().Contains(searchTerm.ToLower()) ||
                     (r.Description != null && r.Description.ToLower().Contains(searchTerm.ToLower())));
-                    //ContainsSearchTerm(r.Products, searchTerm));
+                //ContainsSearchTerm(r.Products, searchTerm));
             }
 
             var recipes = await recipeQuery
@@ -59,7 +59,7 @@ namespace ShareRecipe.Services
             {
                 TotalRecipesCount = totalRecipesCount,
                 Recipes = recipes
-            }; 
+            };
         }
 
         public async Task<int> CreateAsync(RecipeFormModel model)
@@ -88,8 +88,38 @@ namespace ShareRecipe.Services
 
             await context.Recipes.AddAsync(recipe);
             await context.SaveChangesAsync();
-             
+
             return recipe.Id;
+        }
+
+        public async Task EditAsync(int recipeId, string title, string? description, string imageUrl, int categoryId, string ingridients)
+        {
+            var recipe = await context.Recipes.FirstAsync(r => r.Id == recipeId);
+            var allProducts = await context.Products.Where(p => p.RecipeId == recipeId).ToListAsync();
+
+            var productNames = ingridients.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
+            List<Product> products = new List<Product>();
+
+            foreach (var name in productNames)
+            {
+                Product product = new Product()
+                {
+                    Name = name.ToLower()
+                };
+
+                products.Add(product);
+            }
+
+            allProducts = products;
+
+            recipe.Title = title;
+            recipe.Description = description;
+            recipe.ImageUrl = imageUrl;
+            recipe.CategoryId = categoryId;
+            recipe.Products = products;
+
+
+            await context.SaveChangesAsync();
         }
 
         /// <summary>
@@ -97,7 +127,7 @@ namespace ShareRecipe.Services
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<bool> Exist(int id)
+        public async Task<bool> ExistsAsync(int id)
         {
             return await context.Recipes
                 .AnyAsync(r => r.Id == id);
@@ -142,6 +172,45 @@ namespace ShareRecipe.Services
                     Name = p.Name
                 })
                 .ToListAsync();
+        }
+
+        public async Task<IEnumerable<RecipeProductServiceModel>> GetAllProductsByRecipeIdAsync(int recipeId)
+        {
+            return await context.Products
+                .Where(p => p.RecipeId == recipeId)
+                .Select(p => new RecipeProductServiceModel()
+                {
+                    Id = p.Id,
+                    Name = p.Name
+                })
+                .ToListAsync();
+        }
+
+
+        /// <summary>
+        /// Get all products of the recipe with given id.
+        /// </summary>
+        /// <param name="recipeId"></param>
+        /// <returns>List of products</returns>
+        public async Task<IEnumerable<string>> GetProductNamesByRecipeIdAsync(int recipeId)
+        {
+            return await context.Products
+                .Where(p => p.RecipeId == recipeId)
+                .Select(p => p.Name)
+                .ToListAsync();
+        }
+
+
+        /// <summary>
+        /// Get category id by recipe with given reicpe id.
+        /// </summary>
+        /// <param name="recipeId"></param>
+        /// <returns></returns>
+        public async Task<int> GetRecipeCategoryIdAsync(int recipeId)
+        {
+            var recipe = await context.Recipes.FirstAsync(r => r.Id == recipeId);
+
+            return recipe.CategoryId;
         }
 
         /// <summary>

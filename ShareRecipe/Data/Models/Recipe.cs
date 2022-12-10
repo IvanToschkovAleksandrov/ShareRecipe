@@ -19,6 +19,7 @@ namespace ShareRecipe.Data.Models
         [StringLength(500)]
         public string ImageUrl { get; set; } = null!;
 
+
         public IEnumerable<Product> Products { get; set; } = new List<Product>();
 
         [ForeignKey(nameof(Category))]
