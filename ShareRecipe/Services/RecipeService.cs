@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ShareRecipe.Contracts;
 using ShareRecipe.Data;
 using ShareRecipe.Data.Models;
@@ -62,6 +63,11 @@ namespace ShareRecipe.Services
             };
         }
 
+        /// <summary>
+        /// Create new recipe in the database.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public async Task<int> CreateAsync(RecipeFormModel model)
         {
             var productNames = model.Ingridients.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -90,6 +96,19 @@ namespace ShareRecipe.Services
             await context.SaveChangesAsync();
 
             return recipe.Id;
+        }
+
+
+        /// <summary>
+        /// Delete recipe by given recipe Id.
+        /// </summary>
+        /// <param name="recipeId"></param>
+        /// <returns></returns>
+        public async Task DeleteAsync(int recipeId)
+        {
+            var recipe = await context.Recipes.FirstAsync(r => r.Id == recipeId);
+            context.Recipes.Remove(recipe);
+            await context.SaveChangesAsync();
         }
 
         public async Task EditAsync(int recipeId, string title, string? description, string imageUrl, int categoryId, string ingridients)

@@ -144,14 +144,34 @@ namespace ShareRecipe.Controllers
         }
 
         [HttpGet]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            return View(new RecipeDetailsViewModel());
+            if (await recipeService.ExistsAsync(id) == false)
+            {
+                return BadRequest();
+            }
+
+            var recipe = await recipeService.RecipeDetailsByIdAsync(id);
+            var model = new RecipeDetailsViewModel()
+            {
+                Id = recipe.Id,
+                Title = recipe.Title,
+                ImageUrl = recipe.ImageUrl
+            };
+
+            return View(model);
         }
 
-        [HttpGet]
-        public IActionResult Delete(RecipeDetailsViewModel model)
+        [HttpPost]
+        public async Task<IActionResult> Delete(RecipeDetailsViewModel model)
         {
+            if (await recipeService.ExistsAsync(model.Id) == false)
+            {
+                return BadRequest();
+            }
+
+            await recipeService.DeleteAsync(model.Id);
+
             return RedirectToAction(nameof(All));
         }
     }

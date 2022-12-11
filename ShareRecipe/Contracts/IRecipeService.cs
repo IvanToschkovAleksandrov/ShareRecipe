@@ -25,6 +25,8 @@ namespace ShareRecipe.Contracts
         
         Task<int> CreateAsync(RecipeFormModel model);
 
+        Task DeleteAsync(int recipeId);
+
         Task<bool> ExistsAsync(int id);
 
         Task<RecipeDetailsServiceModel> RecipeDetailsByIdAsync(int id);
