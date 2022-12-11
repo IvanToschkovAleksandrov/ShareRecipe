@@ -49,9 +49,9 @@ namespace ShareRecipe.Controllers
         /// <returns></returns>
         public async Task<IActionResult> Details(int id)
         {
-            if (!ModelState.IsValid)
+            if (await recipeService.ExistsAsync(id) == false)
             {
-                return BadRequest();
+                return RedirectToAction(nameof(All));
             }
 
             var model = await recipeService.RecipeDetailsByIdAsync(id);
