@@ -128,7 +128,7 @@ namespace ShareRecipe.Controllers
         {
             if (await recipeService.ExistsAsync(id) == false)
             {
-                return View();
+                return RedirectToAction(nameof(All));
             }
 
             if (!ModelState.IsValid)
@@ -140,7 +140,7 @@ namespace ShareRecipe.Controllers
 
             await recipeService.EditAsync(id, model.Title, model.Description, model.ImageUrl, model.CategoryId, model.Ingridients);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(Details));
         }
 
         [HttpGet]
